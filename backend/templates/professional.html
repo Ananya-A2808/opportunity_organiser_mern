@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Professional Resume</title>
+<style>
+body {
+font-family: 'Times New Roman', Times, serif;
+line-height: 1.6;
+color: #333;
+margin: 0;
+padding: 20px;
+}
+.container {
+max-width: 800px;
+margin: 0 auto;
+background: white;
+padding: 40px;
+}
+header {
+text-align: center;
+margin-bottom: 30px;
+border-bottom: 2px solid #4b0082;
+padding-bottom: 20px;
+}
+.profile {
+width: 120px;
+height: 120px;
+border-radius: 50%;
+object-fit: cover;
+margin: 0 auto 20px;
+border: 2px solid #4b0082;
+}
+header h1 {
+margin: 0;
+font-size: 2.2em;
+text-transform: uppercase;
+letter-spacing: 2px;
+}
+header h3 {
+margin: 10px 0;
+font-size: 1.3em;
+font-weight: normal;
+color: #4b0082;
+}
+header p {
+margin: 5px 0;
+color: #666;
+}
+section {
+margin-bottom: 25px;
+}
+section h2 {
+font-size: 1.4em;
+text-transform: uppercase;
+border-bottom: 1px solid #4b0082;
+padding-bottom: 5px;
+margin-bottom: 15px;
+}
+ul {
+list-style-type: none;
+padding: 0;
+margin: 0;
+}
+li {
+margin-bottom: 8px;
+padding-left: 20px;
+position: relative;
+}
+li:before {
+content: "•";
+position: absolute;
+left: 0;
+}
+.skills-list {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
+.skill-item {
+background: #f0f0f0;
+color: #4b0082;
+padding: 4px 12px;
+border-radius: 3px;
+font-size: 0.9em;
+border: 1px solid #4b0082;
+}
+.references {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 15px;
+}
+.reference-item {
+border-left: 2px solid #4b0082;
+padding-left: 15px;
+}
+@media print {
+body {
+padding: 0;
+}
+.container {
+padding: 20px;
+}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<img src="<%= data.profile_image ? data.profile_image : 'https://i.ibb.co/DGrKhr8/profile.png' %>" class="profile" alt="Profile Picture">
+<h1><%= data.name %></h1>
+<h3><%= data.title %></h3>
+<p>
+<% if (data.phone) { %>📞 <%= data.phone %><% } %>
+<% if (data.email) { %> | ✉️ <%= data.email %><% } %>
+<% if (data.website) { %> | 🌐 <%= data.website %><% } %>
+</p>
+</header>
+
+<% if (data.about) { %>
+<section>
+<h2>Professional Summary</h2>
+<p><%= data.about %></p>
+</section>
+<% } %>
+
+<% if (data.edu1 || data.edu2 || data.edu3) { %>
+<section>
+<h2>Education</h2>
+<ul>
+<% if (data.edu1) { %><li><%= data.edu1 %></li><% } %>
+<% if (data.edu2) { %><li><%= data.edu2 %></li><% } %>
+<% if (data.edu3) { %><li><%= data.edu3 %></li><% } %>
+</ul>
+</section>
+<% } %>
+
+<% if (data.exp1 || data.exp2) { %>
+<section>
+<h2>Professional Experience</h2>
+<ul>
+<% if (data.exp1) { %><li><%= data.exp1 %></li><% } %>
+<% if (data.exp2) { %><li><%= data.exp2 %></li><% } %>
+</ul>
+</section>
+<% } %>
+
+<% if (data.proj1 || data.proj2 || data.proj3) { %>
+<section>
+<h2>Key Projects</h2>
+<ul>
+<% if (data.proj1) { %><li><%= data.proj1 %></li><% } %>
+<% if (data.proj2) { %><li><%= data.proj2 %></li><% } %>
+<% if (data.proj3) { %><li><%= data.proj3 %></li><% } %>
+</ul>
+</section>
+<% } %>
+
+<% if (data.skills) { %>
+<section>
+<h2>Skills & Expertise</h2>
+<div class="skills-list">
+<% data.skills.split(',').forEach(function(skill) { %>
+<span class="skill-item"><%= skill.trim() %></span>
+<% }); %>
+</div>
+</section>
+<% } %>
+
+<% if (data.ref1 || data.ref2) { %>
+<section>
+<h2>Professional References</h2>
+<div class="references">
+<% if (data.ref1) { %>
+<div class="reference-item">
+<p><%= data.ref1 %></p>
+</div>
+<% } %>
+<% if (data.ref2) { %>
+<div class="reference-item">
+<p><%= data.ref2 %></p>
+</div>
+<% } %>
+</div>
+</section>
+<% } %>
+</div>
+</body>
+</html>

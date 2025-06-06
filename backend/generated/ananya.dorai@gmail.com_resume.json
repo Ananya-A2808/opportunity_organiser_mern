@@ -1,0 +1,48 @@
+{
+  "email": "ananya.dorai@gmail.com",
+  "name": "Ananya A",
+  "jobRole": "data analyst",
+  "professionalSummary": "Results-driven Data Analyst with expertise in data collection, analysis, and visualization. Proficient in using statistical tools and programming languages to interpret complex datasets and deliver actionable insights. Strong problem-solving skills with a focus on improving business processes and enhancing decision-making. Experienced in collaborating with cross-functional teams to identify trends and drive data-informed strategies. Committed to leveraging analytical skills to support organizational goals and foster data-driven culture.",
+  "education": [
+    {
+      "degree": "Btech",
+      "institution": "MSRIT",
+      "startYear": "2022",
+      "endYear": "2026",
+      "_id": "6843008a8370a5340807e789"
+    }
+  ],
+  "experience": [
+    {
+      "title": "Intern",
+      "company": "Ayla Networks",
+      "startYear": "2023",
+      "endYear": "2023",
+      "description": "",
+      "_id": "6843008a8370a5340807e78a"
+    }
+  ],
+  "projects": [
+    {
+      "title": "UPI app",
+      "description": "it was for blind",
+      "_id": "6843008a8370a5340807e78b"
+    }
+  ],
+  "skills": [
+    "data visualization",
+    "statistical analysis",
+    "SQL",
+    "Python",
+    "Excel"
+  ],
+  "references": [
+    {
+      "name": "DR Raj",
+      "contact": "9985634178",
+      "_id": "6843008a8370a5340807e78c"
+    }
+  ],
+  "format": "modern",
+  "profileImage": "1749227153921-899774403-download.png"
+}
