@@ -11,8 +11,8 @@ beforeAll(async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-});
+}, 60000);
 
 afterAll(async () => {
   await mongoose.connection.close();
-});
+}, 60000);
