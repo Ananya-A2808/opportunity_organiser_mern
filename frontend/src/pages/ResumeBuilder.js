@@ -234,9 +234,14 @@ const ResumeBuilder = () => {
         references,
         format,
       };
-      const res = await axios.post('http://localhost:5000/api/resume/download_pdf', data);
-      const url = `http://localhost:5000/api/resume/download_pdf/${res.data.filename}`;
-      window.open(url, '_blank');
+      const response = await axios.post('http://localhost:5000/api/resume/download_pdf_wkhtmltopdf', data, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'resume.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     } catch (err) {
       console.error(err);
       alert('Failed to download PDF');

@@ -5,6 +5,10 @@ const PPTXGenJS = require('pptxgenjs');
 const OpenAI = require('openai');
 const ejs = require('ejs');
 const wkhtmltopdf = require('wkhtmltopdf');
+
+const wkhtmltopdfConfig = {
+  binary: "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe" // Set the full path to wkhtmltopdf executable here
+};
 const { PassThrough } = require('stream');
 const Resume = require('../models/Resume');
 
@@ -203,7 +207,7 @@ exports.generatePdfFromPreview = async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=resume.pdf');
 
     // Use wkhtmltopdf to convert HTML to PDF and pipe to response
-    wkhtmltopdf(html, { pageSize: 'A4', marginTop: '0.75in', marginRight: '0.75in', marginBottom: '0.75in', marginLeft: '0.75in' })
+    wkhtmltopdf(html, { pageSize: 'A4', marginTop: '0.75in', marginRight: '0.75in', marginBottom: '0.75in', marginLeft: '0.75in' }, wkhtmltopdfConfig)
       .pipe(res);
   } catch (error) {
     console.error('Generate PDF from preview error:', error);
@@ -425,27 +429,63 @@ function createPresentation(data, outputPath) {
 
 exports.downloadPdf = async (req, res) => {
   try {
-    let data;
-    if (req.method === 'POST') {
-      data = req.body;
-    } else if (req.method === 'GET') {
-      const filename = req.params.filename;
-      const filePath = path.join(__dirname, '..', 'generated', filename);
-      if (fs.existsSync(filePath)) {
-        return res.download(filePath);
-      } else {
-        return res.status(404).json({ message: 'File not found' });
-      }
+    const data = req.body;
+    const format = data.format || 'modern';
+
+    // Map frontend data structure to template expected fields
+    const mappedData = {};
+
+    mappedData.name = data.name || '';
+    mappedData.title = data.jobRole || '';
+    mappedData.phone = data.phone || '';
+    mappedData.email = data.email || '';
+    mappedData.website = data.website || '';
+    mappedData.profile_image = data.profileImage || '';
+
+    mappedData.about = data.professionalSummary || '';
+
+    // Map education array to edu1, edu2, edu3
+    if (Array.isArray(data.education)) {
+      mappedData.edu1 = data.education[0] ? `${data.education[0].degree} - ${data.education[0].institution} (${data.education[0].startYear} - ${data.education[0].endYear})` : '';
+      mappedData.edu2 = data.education[1] ? `${data.education[1].degree} - ${data.education[1].institution} (${data.education[1].startYear} - ${data.education[1].endYear})` : '';
+      mappedData.edu3 = data.education[2] ? `${data.education[2].degree} - ${data.education[2].institution} (${data.education[2].startYear} - ${data.education[2].endYear})` : '';
     }
 
-    if (!data) return res.status(400).json({ message: 'No data provided' });
+    // Map experience array to exp1, exp2
+    if (Array.isArray(data.experience)) {
+      mappedData.exp1 = data.experience[0] ? `${data.experience[0].title} at ${data.experience[0].company} (${data.experience[0].startYear} - ${data.experience[0].endYear})` : '';
+      mappedData.exp2 = data.experience[1] ? `${data.experience[1].title} at ${data.experience[1].company} (${data.experience[1].startYear} - ${data.experience[1].endYear})` : '';
+    }
 
-    const filename = `${data.email || 'resume'}_${Date.now()}.pdf`;
-    const outputPath = path.join(__dirname, '..', 'generated', filename);
+    // Map projects if any (not in frontend data, so leave empty)
+    mappedData.proj1 = '';
+    mappedData.proj2 = '';
+    mappedData.proj3 = '';
 
-    await createPdf(data, outputPath);
+    // Map skills array to comma separated string
+    if (Array.isArray(data.skills)) {
+      mappedData.skills = data.skills.join(', ');
+    } else {
+      mappedData.skills = '';
+    }
 
-    res.json({ filename });
+    // Map references array to ref1, ref2
+    if (Array.isArray(data.references)) {
+      mappedData.ref1 = data.references[0] ? `${data.references[0].name} - ${data.references[0].contact}` : '';
+      mappedData.ref2 = data.references[1] ? `${data.references[1].name} - ${data.references[1].contact}` : '';
+    }
+
+    // Render the appropriate template to HTML string
+    const templatePath = path.join(__dirname, '..', 'templates', format + '.html');
+    const html = await ejs.renderFile(templatePath, { data: mappedData });
+
+    // Set response headers for PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=resume.pdf');
+
+    // Use wkhtmltopdf to convert HTML to PDF and pipe to response
+    wkhtmltopdf(html, { pageSize: 'A4', marginTop: '0.75in', marginRight: '0.75in', marginBottom: '0.75in', marginLeft: '0.75in' }, wkhtmltopdfConfig)
+      .pipe(res);
   } catch (error) {
     console.error('Download PDF error:', error);
     res.status(500).json({ message: 'Server error' });

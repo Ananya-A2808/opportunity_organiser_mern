@@ -3,6 +3,7 @@ import { Box, Button, Container, Typography, Avatar, Paper, FormControl, InputLa
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 const ResumeHeader = ({ data, format }) => {
   const isProfessional = format === 'professional';
   return (
@@ -121,13 +122,12 @@ const ResumeView = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        '/api/resume/download_pdf_wkhtmltopdf',
-        { ...data, format },
-        { responseType: 'blob' }
+        'http://localhost:5000/api/resume/download_pdf',
+        { ...data, format }
       );
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const filename = response.data.filename;
       const link = document.createElement('a');
-      link.href = url;
+      link.href = `http://localhost:5000/api/resume/download_pdf/${filename}`;
       link.setAttribute('download', 'resume.pdf');
       document.body.appendChild(link);
       link.click();
@@ -140,7 +140,7 @@ const ResumeView = () => {
   };
 
   return (
-    <Box sx={{ fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", lineHeight: 1.6, color: '#222', margin: 0, padding: 2, backgroundColor: '#f9f9f9' }}>
+    <Box id="resume-content" sx={{ fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", lineHeight: 1.6, color: '#222', margin: 0, padding: 2, backgroundColor: '#f9f9f9' }}>
       <Container maxWidth="md" sx={{ padding: 4, backgroundColor: '#fff', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
         <Paper sx={{ padding: 4, maxWidth: 800, margin: '0 auto' }}>
           <FormControl fullWidth sx={{ marginBottom: 3 }}>

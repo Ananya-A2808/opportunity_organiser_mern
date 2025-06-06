@@ -296,11 +296,17 @@ const ResumeBuilder = () => {
         projects,
         skills,
         references,
-        format,
+        format: 'modern',  // force modern format for PDF
       };
-      const res = await axios.post('http://localhost:5000/api/resume/download_pdf', data);
-      const url = `http://localhost:5000/api/resume/download_pdf/${res.data.filename}`;
-      window.open(url, '_blank');
+      // Use backend generatePdfFromPreview endpoint for HTML template based PDF generation
+      const response = await axios.post('http://localhost:5000/api/resume/download', data);
+      const filename = response.data.filename;
+      const link = document.createElement('a');
+      link.href = `http://localhost:5000/api/resume/download_pdf/${filename}`;
+      link.setAttribute('download', 'resume.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     } catch (err) {
       console.error(err);
       alert('Failed to download PDF');

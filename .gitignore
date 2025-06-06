@@ -5,3 +5,7 @@ frontend/node_modules
 .env
 .env.local
 .env.*
+
+# Ignore uploads and generated folders
+backend/uploads/
+backend/generated/
