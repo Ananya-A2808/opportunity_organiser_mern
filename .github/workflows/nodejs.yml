@@ -25,21 +25,21 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Install backend dependencies
-      working-directory: ./opportunity_organiser_mern/backend
+      working-directory: ./backend
       run: npm install
 
     - name: Run backend tests
-      working-directory: ./opportunity_organiser_mern/backend
+      working-directory: ./backend
       run: npm test
 
     - name: Install frontend dependencies
-      working-directory: ./opportunity_organiser_mern/frontend
+      working-directory: ./frontend
       run: npm install
 
     - name: Build frontend
-      working-directory: ./opportunity_organiser_mern/frontend
+      working-directory: ./frontend
       run: npm run build
 
     - name: Run frontend tests
-      working-directory: ./opportunity_organiser_mern/frontend
+      working-directory: ./frontend
       run: npm test -- --watchAll=false
