@@ -213,3 +213,58 @@ exports.getSkillSuggestions = async (req, res) => {
     res.status(500).json({ message: 'Error generating suggestions' });
   }
 };
+// At the end of resumeController.js or near similar export functions
+
+exports.generatePdfWithWkhtmltopdf = async (req, res) => {
+  try {
+    const data = req.body;
+    const format = data.format || 'modern';
+
+    const mappedData = {
+      name: data.name || '',
+      title: data.jobRole || '',
+      phone: data.phone || '',
+      email: data.email || '',
+      website: data.website || '',
+      profile_image: data.profileImage || '',
+      about: data.professionalSummary || '',
+      skills: Array.isArray(data.skills) ? data.skills.join(', ') : ''
+    };
+
+    if (Array.isArray(data.education)) {
+      mappedData.edu1 = data.education[0] ? `${data.education[0].degree} - ${data.education[0].institution} (${data.education[0].startYear} - ${data.education[0].endYear})` : '';
+      mappedData.edu2 = data.education[1] ? `${data.education[1].degree} - ${data.education[1].institution} (${data.education[1].startYear} - ${data.education[1].endYear})` : '';
+      mappedData.edu3 = data.education[2] ? `${data.education[2].degree} - ${data.education[2].institution} (${data.education[2].startYear} - ${data.education[2].endYear})` : '';
+    }
+
+    if (Array.isArray(data.experience)) {
+      mappedData.exp1 = data.experience[0] ? `${data.experience[0].title} at ${data.experience[0].company} (${data.experience[0].startYear} - ${data.experience[0].endYear})` : '';
+      mappedData.exp2 = data.experience[1] ? `${data.experience[1].title} at ${data.experience[1].company} (${data.experience[1].startYear} - ${data.experience[1].endYear})` : '';
+    }
+
+    const templatePath = path.join(__dirname, '..', 'templates', format + '.html');
+    const html = await ejs.renderFile(templatePath, { data: mappedData });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=resume.pdf');
+
+    const pdfStream = wkhtmltopdf(html, {
+      pageSize: 'A4',
+      marginTop: '0.75in',
+      marginRight: '0.75in',
+      marginBottom: '0.75in',
+      marginLeft: '0.75in',
+      ...wkhtmltopdfConfig
+    });
+
+    if (!pdfStream) {
+      console.error('wkhtmltopdf returned undefined');
+      return res.status(404).json({ message: 'PDF generation error' });
+    }
+
+    pdfStream.pipe(res);
+  } catch (error) {
+    console.error('generatePdfWithWkhtmltopdf error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
