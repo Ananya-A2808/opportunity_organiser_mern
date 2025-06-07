@@ -3,7 +3,7 @@ module.exports = {
     "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(axios)/)", // transform axios, but ignore other node_modules
+    "node_modules/(?!(axios)/)"
   ],
-  setupFilesAfterEnv: ["<rootDir>/src/setupTests.js"], // if you have setupTests.js
+  setupFilesAfterEnv: ["<rootDir>/src/setupTests.js"],
 };
