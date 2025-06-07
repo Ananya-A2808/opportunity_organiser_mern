@@ -60,14 +60,12 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/download_pdf_wkhtmltopdf should respond with 200', async () => {
-    wkhtmltopdf.mockImplementation((html, options, cb) => {
-      if (typeof options === 'function') {
-        cb = options;
-      }
-      const readable = new stream.Readable();
-      readable._read = () => {};
-      readable.pipe = jest.fn();
-      cb(null, readable);
+    wkhtmltopdf.mockImplementation(() => {
+      const readable = new stream.Readable({
+        read() {}
+      });
+      readable.pipe = jest.fn(() => readable);
+      return readable;
     });
 
     const response = await request(app)
