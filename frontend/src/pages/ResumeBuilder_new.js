@@ -3,7 +3,8 @@ import {
   Container, Typography, TextField, Button, Grid, MenuItem, Box, Paper, Chip, IconButton, Avatar
 } from '@mui/material';
 import { AddCircle, Delete } from '@mui/icons-material';
-import axios from 'axios';
+const axios = require('axios').default;
+
 
 const formats = [
   { value: 'modern', label: 'Modern' },
