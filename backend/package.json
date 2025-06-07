@@ -27,7 +27,8 @@
     "pdfkit": "^0.13.0",
     "pptxgenjs": "^3.10.0",
     "sanitize-html": "^2.8.1",
-    "wkhtmltopdf": "^0.4.0"
+    "wkhtmltopdf": "^0.4.0",
+    "prom-client": "^14.0.1"
   },
   "devDependencies": {
     "jest": "^29.6.1",

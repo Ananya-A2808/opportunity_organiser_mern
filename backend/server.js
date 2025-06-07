@@ -5,12 +5,28 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+const promClient = require('prom-client');
+
 const authRoutes = require('./routes/auth');
 const emailRoutes = require('./routes/email');
 const resumeRoutes = require('./routes/resume');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Prometheus metrics setup
+const collectDefaultMetrics = promClient.collectDefaultMetrics;
+collectDefaultMetrics();
+
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', promClient.register.contentType);
+    const metrics = await promClient.register.metrics();
+    res.end(metrics);
+  } catch (ex) {
+    res.status(500).end(ex);
+  }
+});
 
 // Middleware
 app.use(cors({

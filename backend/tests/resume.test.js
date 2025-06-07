@@ -100,3 +100,4 @@ describe('Resume API Endpoints', () => {
       .get('/api/resume/get_resume/test@example.com');
     expect([200, 404]).toContain(response.statusCode);
   });
+});
