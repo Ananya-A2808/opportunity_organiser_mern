@@ -7,6 +7,31 @@ const stream = require('stream');
 
 jest.mock('wkhtmltopdf');
 
+// Mock OpenAI client
+jest.mock('openai', () => {
+  return {
+    ChatCompletion: jest.fn().mockImplementation(() => {
+      return {
+        create: jest.fn().mockResolvedValue({
+          choices: [{ message: { content: 'Mocked suggestion' } }],
+        }),
+      };
+    }),
+    default: jest.fn(),
+    OpenAI: jest.fn().mockImplementation(() => {
+      return {
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Mocked suggestion' } }],
+            }),
+          },
+        },
+      };
+    }),
+  };
+});
+
 const app = express();
 app.use(express.json());
 app.use('/api/resume', resumeRoutes);
@@ -20,6 +45,7 @@ describe('Resume API Endpoints', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
 
   test('POST /api/resume/save should respond with 200', async () => {
     Resume.prototype.save = jest.fn().mockResolvedValue({});
