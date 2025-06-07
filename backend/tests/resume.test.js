@@ -1,13 +1,28 @@
 const request = require('supertest');
 const express = require('express');
 const resumeRoutes = require('../routes/resume');
+const mongoose = require('mongoose');
+const wkhtmltopdf = require('wkhtmltopdf');
+
+jest.mock('wkhtmltopdf');
 
 const app = express();
 app.use(express.json());
 app.use('/api/resume', resumeRoutes);
 
+// Mock mongoose model methods used in resume routes
+const Resume = require('../models/Resume');
+
+jest.mock('../models/Resume');
+
 describe('Resume API Endpoints', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('POST /api/resume/save should respond with 200', async () => {
+    Resume.prototype.save = jest.fn().mockResolvedValue({});
+
     const response = await request(app)
       .post('/api/resume/save')
       .field('data', JSON.stringify({ email: 'test@example.com' }))
@@ -16,6 +31,7 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/get_role_suggestions should respond with 200', async () => {
+    // Mock any DB calls if needed here
     const response = await request(app)
       .post('/api/resume/get_role_suggestions')
       .send({ query: 'developer' });
@@ -23,6 +39,7 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/get_skill_suggestions should respond with 200', async () => {
+    // Mock any DB calls if needed here
     const response = await request(app)
       .post('/api/resume/get_skill_suggestions')
       .send({ query: 'javascript' });
@@ -42,6 +59,13 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/download_pdf_wkhtmltopdf should respond with 200', async () => {
+    wkhtmltopdf.mockImplementation((html, options, cb) => {
+      if (typeof options === 'function') {
+        cb = options;
+      }
+      cb(null, Buffer.from('pdf content'));
+    });
+
     const response = await request(app)
       .post('/api/resume/download_pdf_wkhtmltopdf')
       .send({ html: '<html></html>' });
@@ -49,6 +73,8 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/preview should respond with 200', async () => {
+    Resume.prototype.save = jest.fn().mockResolvedValue({});
+
     const response = await request(app)
       .post('/api/resume/preview')
       .field('data', JSON.stringify({ email: 'test@example.com' }))
@@ -64,6 +90,8 @@ describe('Resume API Endpoints', () => {
   });
 
   test('GET /api/resume/get_resume/:email should respond with 200 or 404', async () => {
+    Resume.findOne = jest.fn().mockResolvedValue(null);
+
     const response = await request(app)
       .get('/api/resume/get_resume/test@example.com');
     expect([200, 404]).toContain(response.statusCode);
