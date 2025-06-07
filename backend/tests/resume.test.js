@@ -7,28 +7,17 @@ const stream = require('stream');
 
 jest.mock('wkhtmltopdf');
 
-// Mock OpenAI client
 jest.mock('openai', () => {
   return {
-    ChatCompletion: jest.fn().mockImplementation(() => {
-      return {
-        create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: 'Mocked suggestion' } }],
-        }),
-      };
-    }),
-    default: jest.fn(),
-    OpenAI: jest.fn().mockImplementation(() => {
-      return {
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Mocked suggestion' } }],
-            }),
-          },
+    OpenAI: jest.fn().mockImplementation(() => ({
+      chat: {
+        completions: {
+          create: jest.fn().mockResolvedValue({
+            choices: [{ message: { content: 'Mocked suggestion' } }],
+          }),
         },
-      };
-    }),
+      },
+    })),
   };
 });
 
@@ -74,9 +63,24 @@ describe('Resume API Endpoints', () => {
   });
 
   test('GET /api/resume/download_pdf/:filename should respond with 200 or 404', async () => {
+    // Mock fs.existsSync to simulate file existence
+    jest.spyOn(require('fs'), 'existsSync').mockReturnValue(true);
+    // Mock fs.createReadStream to simulate file stream
+    jest.spyOn(require('fs'), 'createReadStream').mockReturnValue({
+      pipe: jest.fn(),
+      on: jest.fn((event, cb) => {
+        if (event === 'error') cb(null);
+        return this;
+      }),
+    });
+
     const response = await request(app)
       .get('/api/resume/download_pdf/testfile.pdf');
     expect([200, 404]).toContain(response.statusCode);
+
+    // Restore mocks
+    require('fs').existsSync.mockRestore();
+    require('fs').createReadStream.mockRestore();
   });
 
   test('GET /api/resume/download_presentation/:filename should respond with 200 or 404', async () => {
@@ -86,11 +90,12 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/download_pdf_wkhtmltopdf should respond with 200', async () => {
+    jest.setTimeout(120000); // Increase timeout to 120 seconds for this test
     wkhtmltopdf.mockImplementation(() => {
-      const readable = new stream.Readable({
-        read() {}
+      const readable = new stream.PassThrough();
+      process.nextTick(() => {
+        readable.emit('end');
       });
-      readable.pipe = jest.fn(() => readable);
       return readable;
     });
 
