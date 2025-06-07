@@ -1,8 +1,8 @@
+const { OpenAI } = require('openai');
 const path = require('path');
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const PPTXGenJS = require('pptxgenjs');
-const OpenAI = require('openai');
 const ejs = require('ejs');
 const wkhtmltopdf = require('wkhtmltopdf');
 const { PassThrough } = require('stream');
@@ -11,11 +11,8 @@ const Resume = require('../models/Resume');
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   baseURL: process.env.OPENAI_API_BASE || undefined,
-  // Add this to specify the Azure deployment if using Azure OpenAI
-  // azure: {
-  //   deploymentName: process.env.OPENAI_DEPLOYMENT_NAME,
-  // },
 });
+
 
 exports.saveResume = async (req, res) => {
   try {
