@@ -66,6 +66,7 @@ describe('Resume API Endpoints', () => {
       }
       const readable = new stream.Readable();
       readable._read = () => {};
+      readable.pipe = jest.fn();
       cb(null, readable);
     });
 
@@ -99,4 +100,3 @@ describe('Resume API Endpoints', () => {
       .get('/api/resume/get_resume/test@example.com');
     expect([200, 404]).toContain(response.statusCode);
   });
-});
