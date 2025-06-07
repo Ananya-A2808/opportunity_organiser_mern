@@ -111,6 +111,7 @@ exports.renderResumePreview = async (req, res) => {
     const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
     const html = await ejs.renderFile(templatePath, { data: mappedData, baseUrl });
 
+
     res.send(html);
   } catch (error) {
     console.error('Render resume preview error:', error);
@@ -245,6 +246,12 @@ exports.generatePdfWithWkhtmltopdf = async (req, res) => {
     const templatePath = path.join(__dirname, '..', 'templates', format + '.html');
     const html = await ejs.renderFile(templatePath, { data: mappedData });
 
+    // 🚨 Added check for empty/invalid HTML
+    if (!html || typeof html !== 'string' || html.trim() === '') {
+      console.error('Invalid or empty HTML provided for PDF generation');
+      return res.status(400).json({ message: 'Invalid resume content' });
+    }
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=resume.pdf');
 
@@ -268,3 +275,4 @@ exports.generatePdfWithWkhtmltopdf = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
