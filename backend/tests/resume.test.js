@@ -27,14 +27,20 @@ app.use('/api/resume', resumeRoutes);
 
 // Mock mongoose model methods used in resume routes
 const Resume = require('../models/Resume');
-
 jest.mock('../models/Resume');
 
 describe('Resume API Endpoints', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    console.error.mockRestore();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
 
   test('POST /api/resume/save should respond with 200', async () => {
     Resume.prototype.save = jest.fn().mockResolvedValue({});
@@ -47,7 +53,6 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/get_role_suggestions should respond with 200', async () => {
-    // Mock any DB calls if needed here
     const response = await request(app)
       .post('/api/resume/get_role_suggestions')
       .send({ summary: 'developer' });
@@ -55,7 +60,6 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/get_skill_suggestions should respond with 200', async () => {
-    // Mock any DB calls if needed here
     const response = await request(app)
       .post('/api/resume/get_skill_suggestions')
       .send({ skills: 'javascript' });
@@ -63,9 +67,7 @@ describe('Resume API Endpoints', () => {
   });
 
   test('GET /api/resume/download_pdf/:filename should respond with 200 or 404', async () => {
-    // Mock fs.existsSync to simulate file existence
     jest.spyOn(require('fs'), 'existsSync').mockReturnValue(true);
-    // Mock fs.createReadStream to simulate file stream
     jest.spyOn(require('fs'), 'createReadStream').mockReturnValue({
       pipe: jest.fn(),
       on: jest.fn((event, cb) => {
@@ -78,7 +80,6 @@ describe('Resume API Endpoints', () => {
       .get('/api/resume/download_pdf/testfile.pdf');
     expect([200, 404]).toContain(response.statusCode);
 
-    // Restore mocks
     require('fs').existsSync.mockRestore();
     require('fs').createReadStream.mockRestore();
   });
@@ -90,11 +91,12 @@ describe('Resume API Endpoints', () => {
   });
 
   test('POST /api/resume/download_pdf_wkhtmltopdf should respond with 200', async () => {
-    jest.setTimeout(120000); // Increase timeout to 120 seconds for this test
+    jest.setTimeout(120000);
     wkhtmltopdf.mockImplementation(() => {
       const readable = new stream.PassThrough();
       process.nextTick(() => {
-        readable.emit('end');
+        readable.write('PDF mock data');
+        readable.end();
       });
       return readable;
     });
@@ -102,6 +104,7 @@ describe('Resume API Endpoints', () => {
     const response = await request(app)
       .post('/api/resume/download_pdf_wkhtmltopdf')
       .send({ html: '<html></html>' });
+
     expect(response.statusCode).toBe(200);
   });
 
