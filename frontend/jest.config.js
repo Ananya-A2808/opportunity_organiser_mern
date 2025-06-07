@@ -6,4 +6,7 @@ module.exports = {
     "node_modules/(?!(axios)/)"
   ],
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.js"],
+  moduleNameMapper: {
+    '^axios$': 'axios/dist/node/axios.cjs.js',
+  },
 };
