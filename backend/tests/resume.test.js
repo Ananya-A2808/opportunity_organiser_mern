@@ -3,6 +3,7 @@ const express = require('express');
 const resumeRoutes = require('../routes/resume');
 const mongoose = require('mongoose');
 const wkhtmltopdf = require('wkhtmltopdf');
+const stream = require('stream');
 
 jest.mock('wkhtmltopdf');
 
@@ -63,7 +64,9 @@ describe('Resume API Endpoints', () => {
       if (typeof options === 'function') {
         cb = options;
       }
-      cb(null, Buffer.from('pdf content'));
+      const readable = new stream.Readable();
+      readable._read = () => {};
+      cb(null, readable);
     });
 
     const response = await request(app)
