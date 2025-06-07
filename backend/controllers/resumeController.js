@@ -207,7 +207,7 @@ exports.generatePdfFromPreview = async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=resume.pdf');
 
     // Use wkhtmltopdf to convert HTML to PDF and pipe to response
-    wkhtmltopdf(html, { pageSize: 'A4', marginTop: '0.75in', marginRight: '0.75in', marginBottom: '0.75in', marginLeft: '0.75in' }, wkhtmltopdfConfig)
+    wkhtmltopdf(html, { pageSize: 'A4', marginTop: '0.75in', marginRight: '0.75in', marginBottom: '0.75in', marginLeft: '0.75in' })
       .pipe(res);
   } catch (error) {
     console.error('Generate PDF from preview error:', error);
@@ -430,6 +430,10 @@ function createPresentation(data, outputPath) {
 exports.downloadPdf = async (req, res) => {
   try {
     const data = req.body;
+    if (!data) {
+      console.error('Download PDF error: No data in request body');
+      return res.status(400).json({ message: 'No data provided' });
+    }
     const format = data.format || 'modern';
 
     // Map frontend data structure to template expected fields
@@ -484,8 +488,12 @@ exports.downloadPdf = async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=resume.pdf');
 
     // Use wkhtmltopdf to convert HTML to PDF and pipe to response
-    wkhtmltopdf(html, { pageSize: 'A4', marginTop: '0.75in', marginRight: '0.75in', marginBottom: '0.75in', marginLeft: '0.75in' }, wkhtmltopdfConfig)
-      .pipe(res);
+    const pdfStream = wkhtmltopdf(html, { pageSize: 'A4', marginTop: '0.75in', marginRight: '0.75in', marginBottom: '0.75in', marginLeft: '0.75in' });
+    if (!pdfStream) {
+      console.error('Download PDF error: wkhtmltopdf returned undefined');
+      return res.status(500).json({ message: 'PDF generation error' });
+    }
+    pdfStream.pipe(res);
   } catch (error) {
     console.error('Download PDF error:', error);
     res.status(500).json({ message: 'Server error' });

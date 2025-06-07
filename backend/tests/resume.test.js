@@ -35,7 +35,7 @@ describe('Resume API Endpoints', () => {
     // Mock any DB calls if needed here
     const response = await request(app)
       .post('/api/resume/get_role_suggestions')
-      .send({ query: 'developer' });
+      .send({ summary: 'developer' });
     expect(response.statusCode).toBe(200);
   });
 
@@ -43,7 +43,7 @@ describe('Resume API Endpoints', () => {
     // Mock any DB calls if needed here
     const response = await request(app)
       .post('/api/resume/get_skill_suggestions')
-      .send({ query: 'javascript' });
+      .send({ skills: 'javascript' });
     expect(response.statusCode).toBe(200);
   });
 
