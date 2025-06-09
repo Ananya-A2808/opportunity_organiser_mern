@@ -210,12 +210,12 @@ padding: 20px;
 </section>
 <% } %>
 
-<form action="/resume/download_pdf_wkhtmltopdf" method="POST">
+<form>
 <% for (var key in data) { %>
 <input type="hidden" name="<%= key %>" value="<%= data[key] %>">
 <% } %>
 <input type="hidden" name="format" value="modern">
-<button type="submit" class="download-btn">Download PDF</button>
+<button type="submit" onclick="window.print()" class="download-btn">Download PDF</button>
 </form>
 </div>
 </body>
