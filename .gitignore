@@ -9,3 +9,9 @@ frontend/node_modules
 # Ignore uploads and generated folders
 backend/uploads/
 backend/generated/
+backend/Dockerfile
+docker-compose.yml
+frontend/Dockerfile
+frontend/nginx.conf
+start.sh
+Dockerfile
